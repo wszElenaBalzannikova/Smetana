@@ -1,0 +1,236 @@
+﻿<Window x:Class="Smetana.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:src="clr-namespace:Smetana"        
+        Title="MainWindow" Height="350" Width="525">
+
+    <Window.Resources>
+
+
+
+        <Style x:Key="ResizeFont">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.2"
+                                                 Storyboard.TargetProperty="FontSize"
+                                                 To="14">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.2"
+                                                 Storyboard.TargetProperty="FontSize">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+     
+        <DataTemplate x:Key="TileTemplate" >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <!--Image Grid.Column="0" Height="90" Stretch="Uniform" Source="{Binding Image}" /-->
+                <StackPanel Grid.Column="1" Margin="2,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Vertical" TextBlock.FontSize="12" TextBlock.FontWeight="Bold">
+                        <Label Content="{Binding FileName}"  Style="{StaticResource ResizeFont}" />
+
+                        <ItemsControl ItemsSource="{Binding Labels}" Grid.Row=" 1" >
+
+                            <ItemsControl.ItemsPanel >
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding Value}" Style="{StaticResource ResizeFont}" Foreground = "Red" VerticalAlignment="Center" Margin="1,0,0,0" Background="#008FE0E0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+
+
+        <DataTemplate x:Key="LabelsListTemplate" DataType="{x:Type src:TaggedFile}" >
+            <TextBlock Text="{Binding Value}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="LabelsCheckTemplate" DataType="{x:Type src:TaggedFile}">
+            <CheckBox Content="{Binding Value}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="DynamicCharacterTemplate" DataType="{x:Type src:TaggedFile}" >
+            <ContentPresenter x:Name="content" ContentTemplate="{StaticResource LabelsListTemplate}" />
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="True" >
+                    <Setter TargetName="content" Property="ContentTemplate" Value="{StaticResource LabelsCheckTemplate}" />
+                </DataTrigger>
+                
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition ></RowDefinition>
+        </Grid.RowDefinitions>
+        <!--Image HorizontalAlignment="Stretch" Width="Auto" Source="Images\ToolBarGradient.png" Stretch="Fill" x:Name="ToolBarImage"/-->
+
+        <ToolBar>
+
+            <Button Click="LoadFiles_Click">Загрузить файлы</Button>
+            <ToggleButton  Name="btnOPen">Назначить теги</ToggleButton>
+            <Button>Close</Button>
+            <Separator></Separator>
+            <CheckBox FontWeight="Bold">Bold</CheckBox>
+            <CheckBox FontStyle="Italic">Italic</CheckBox>
+            <CheckBox>
+                <TextBlock TextDecorations="Underline">Underline</TextBlock>
+            </CheckBox>
+            <Separator></Separator>
+            
+        </ToolBar>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition ></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.64*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="0.36*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Row="0">
+
+                <ListView 
+                Name="views"   
+                ItemsSource="{Binding Components, Mode=OneWay}" 
+                ItemTemplate="{StaticResource TileTemplate}" 
+                DockPanel.Dock="Left" 
+                AllowDrop="True">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="Drop" Handler="views_Drop" />
+                            <EventSetter Event="DragEnter" Handler="views_DropEnter" />
+                            <EventSetter Event="DragLeave" Handler="views_DropLeave" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+
+            </DockPanel>
+          
+            <Grid
+                Grid.Row=" 1" 
+                Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition ></RowDefinition>
+                    
+                </Grid.RowDefinitions>
+                <Grid Name="TagsButtonsPanel" Grid.Row="0" Height="25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <DockPanel >
+                        <Button Click="btnAddTag_Click">Добавить</Button>
+                    </DockPanel>
+                    <GridSplitter 
+                        Grid.Row="0" 
+                        Grid.Column="1" 
+                        Grid.RowSpan="2" 
+                        Width="5"
+                        VerticalAlignment="Stretch" 
+                        HorizontalAlignment="Center">
+                    </GridSplitter>
+                    <DockPanel Grid.Column="2">
+                        <Button>Переименовать</Button>
+                    </DockPanel>
+                    <GridSplitter 
+                        Grid.Row="0" 
+                        Grid.Column="3" 
+                        Grid.RowSpan="2" 
+                        Width="5"
+                        VerticalAlignment="Stretch" 
+                        HorizontalAlignment="Center">
+                    </GridSplitter>
+                    <DockPanel Grid.Column="4">
+                        <Button>Удалить</Button>
+                    </DockPanel>
+                </Grid>
+
+                
+                <Grid Name="AddLabelPanel" Grid.Row="0" Height="25" Visibility="Hidden" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="25"></ColumnDefinition>
+                        <ColumnDefinition Width="25"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Name="tbNewLabel" FontSize="14" ></TextBox>
+                    <Button 
+                        Name="btnAcceptNewTag" 
+                        Grid.Column="1"
+                        Click="btnAcceptNewTag_Click" IsDefault="True">\/</Button>
+                    
+                    <Button 
+                        Name="btnCancelNewTag" 
+                        Grid.Column="2"
+                        Click="btnCancelNewTag_Click">x</Button>
+                </Grid>
+            
+                <ListView 
+                    Name="TagsList" 
+                    Grid.Row="1" 
+                     ItemsSource="{Binding LabelsCollection, Mode=OneWay}"
+                    ItemTemplate="{StaticResource DynamicCharacterTemplate}"
+                    MouseDown="SelectedTag_MouseDown">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="SelectedTag_MouseDown" />                            
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                
+            </Grid>
+            
+            <GridSplitter 
+                Grid.Row="0" 
+                Grid.Column="1" 
+                Grid.RowSpan="2" 
+                Width="5"
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Center">
+
+            </GridSplitter>
+
+        </Grid>
+    </Grid>
+</Window>
