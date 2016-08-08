@@ -20,6 +20,35 @@ using System.ComponentModel;
 
 namespace Smetana
 {
+    public class StringObject : INotifyPropertyChanged
+    {
+        private bool _TagChecked;
+
+        public string Value { get; set; }
+
+        public bool TagChecked
+        {
+            get { return _TagChecked; }
+            set
+                {
+                    _TagChecked = value;
+                    OnPropertyChanged("TagChecked");
+                }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            var propertyChanged = PropertyChanged;
+            if (propertyChanged != null)
+            {
+                propertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -97,10 +126,7 @@ namespace Smetana
                 return labelsCollection;
             }
         }
-        public class StringObject
-        {
-            public string Value { get; set; }
-        }
+        
 
         public void SelectedTag_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -169,6 +195,59 @@ namespace Smetana
             }
             AddLabelPanel.Visibility = System.Windows.Visibility.Hidden;
             TagsButtonsPanel.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void AcceptChanges_Click(object sender, RoutedEventArgs e)
+        {
+            AcceptCancelPanel.Visibility = System.Windows.Visibility.Hidden;
+            TagsButtonsPanel.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void CancelChanges_Click(object sender, RoutedEventArgs e)
+        {
+            AcceptCancelPanel.Visibility = System.Windows.Visibility.Hidden;
+            TagsButtonsPanel.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void btnOPen_Checked(object sender, RoutedEventArgs e)
+        {           
+            AcceptCancelPanel.Visibility = System.Windows.Visibility.Visible;
+            TagsButtonsPanel.Visibility = System.Windows.Visibility.Hidden;
+
+            // Показать имеющиеся теги
+            if(views.SelectedItem != null)
+            {
+                TaggedFile SelectedFile = views.SelectedItem as TaggedFile;
+                if(SelectedFile != null)
+                {
+                    string[] SelectedFileTags = Engine.Get().GetFileTags(SelectedFile.FileName);
+                                       
+                    foreach (StringObject ListedTag in LabelsCollection)
+                    {
+                        ListedTag.TagChecked = false;
+                        for(int i = 0; i < SelectedFileTags.Length; i++)                   
+                        {
+                            if(ListedTag.Value == SelectedFileTags[i])
+                            {
+                                ListedTag.TagChecked = true;
+                                break;
+                            }
+                        }
+                        
+                    }
+                }
+
+            }
+
+        }
+
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            StringObject ClickedTag = sender as StringObject;
+            if(ClickedTag != null)
+            {
+                ClickedTag.TagChecked = !ClickedTag.TagChecked  ;
+            }
         }
 
 

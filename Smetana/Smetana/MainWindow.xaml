@@ -72,12 +72,14 @@
 
 
 
-        <DataTemplate x:Key="LabelsListTemplate" DataType="{x:Type src:TaggedFile}" >
+        <DataTemplate x:Key="LabelsListTemplate" DataType="{x:Type src:MainWindow}" >
             <TextBlock Text="{Binding Value}" />
         </DataTemplate>
 
-        <DataTemplate x:Key="LabelsCheckTemplate" DataType="{x:Type src:TaggedFile}">
-            <CheckBox Content="{Binding Value}" />
+        <DataTemplate x:Key="LabelsCheckTemplate" DataType="{x:Type src:MainWindow}">
+            <CheckBox 
+                Content="{Binding Value}"  
+                IsChecked="{Binding TagChecked}"/> 
         </DataTemplate>
 
         <DataTemplate x:Key="DynamicCharacterTemplate" DataType="{x:Type src:TaggedFile}" >
@@ -103,7 +105,7 @@
         <ToolBar>
 
             <Button Click="LoadFiles_Click">Загрузить файлы</Button>
-            <ToggleButton  Name="btnOPen">Назначить теги</ToggleButton>
+            <ToggleButton  Name="btnOPen" Checked="btnOPen_Checked">Назначить теги</ToggleButton>
             <Button>Close</Button>
             <Separator></Separator>
             <CheckBox FontWeight="Bold">Bold</CheckBox>
@@ -152,6 +154,8 @@
                     <RowDefinition ></RowDefinition>
                     
                 </Grid.RowDefinitions>
+                
+                <!-- Layer 1  main buttons -->
                 <Grid Name="TagsButtonsPanel" Grid.Row="0" Height="25">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
@@ -186,8 +190,9 @@
                         <Button>Удалить</Button>
                     </DockPanel>
                 </Grid>
-
+                <!-- End of layer 1-->
                 
+                <!-- Layer 2 Add tag panel -->
                 <Grid Name="AddLabelPanel" Grid.Row="0" Height="25" Visibility="Hidden" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
@@ -205,7 +210,31 @@
                         Grid.Column="2"
                         Click="btnCancelNewTag_Click">x</Button>
                 </Grid>
-            
+                <!-- End layer 2 -->
+                
+                <!-- Layer 3 Accept/Cancel buttons -->
+                <Grid Name="AcceptCancelPanel" Grid.Row="0" Height="25" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <DockPanel >
+                        <Button Name="AcceptChanges" Click="AcceptChanges_Click" IsDefault="True" >Принять</Button>
+                    </DockPanel>
+                    <GridSplitter 
+                        Grid.Row="0" 
+                        Grid.Column="1" 
+                        Grid.RowSpan="2" 
+                        Width="5"
+                        VerticalAlignment="Stretch" 
+                        HorizontalAlignment="Center">
+                    </GridSplitter>
+                    <DockPanel Grid.Column="2">
+                        <Button Name="CancelChanges" Click="CancelChanges_Click" IsCancel="True">Отклонить</Button>
+                    </DockPanel>
+                </Grid>
+                
                 <ListView 
                     Name="TagsList" 
                     Grid.Row="1" 
@@ -217,9 +246,9 @@
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="SelectedTag_MouseDown" />                            
                         </Style>
                     </ListView.ItemContainerStyle>
-                </ListView>
-                
+                </ListView>                
             </Grid>
+                       
             
             <GridSplitter 
                 Grid.Row="0" 
