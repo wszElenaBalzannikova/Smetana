@@ -17,6 +17,7 @@ using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
 using Microsoft.Win32;
 using System.ComponentModel;
+using System.Threading;
 
 namespace Smetana
 {
@@ -48,6 +49,31 @@ namespace Smetana
         }
     }
 
+     public class BoolObject : INotifyPropertyChanged
+     {
+         private bool _TagChecked;
+                 
+         public bool TagChecked
+         {
+             get { return _TagChecked; }
+             set
+             {
+                 _TagChecked = value;
+                 OnPropertyChanged("TagChecked");
+             }
+         }
+
+         public event PropertyChangedEventHandler PropertyChanged;
+
+         protected void OnPropertyChanged(string propertyName)
+         {
+             var propertyChanged = PropertyChanged;
+             if (propertyChanged != null)
+             {
+                 propertyChanged(this, new PropertyChangedEventArgs(propertyName));
+             }
+         }
+     }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -76,6 +102,7 @@ namespace Smetana
 
         private void LoadFilesList()
         {
+            Components.Clear();
             foreach (string CurrentFileName in Engine.Get().GetFilesList())
             {
                 Components.Add(new TaggedFile(CurrentFileName, Engine.Get().GetFileTags(CurrentFileName)));
@@ -115,7 +142,7 @@ namespace Smetana
             }
         }
 
-        public ObservableCollection<StringObject> labelsCollection;
+        private ObservableCollection<StringObject> labelsCollection;
         public ObservableCollection<StringObject> LabelsCollection
         {
             get
@@ -126,13 +153,35 @@ namespace Smetana
                 return labelsCollection;
             }
         }
-        
 
+        private BoolObject _TagAssigmentActive;
+        public BoolObject TagAssigmentActive 
+        {
+            get
+            {
+                if (_TagAssigmentActive == null)
+                {
+                    _TagAssigmentActive = new BoolObject() { TagChecked = false };
+                }
+                return _TagAssigmentActive;
+            }
+
+            set
+            {
+                _TagAssigmentActive = value;
+            }
+        }
+        
         public void SelectedTag_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ListViewItem SenderItem = sender as ListViewItem;
-            if(SenderItem != null)
-            DragDrop.DoDragDrop(SenderItem, (SenderItem.Content as StringObject).Value, DragDropEffects.Copy);
+            if (SenderItem != null)
+            {
+                DragDrop.DoDragDrop(SenderItem, (SenderItem.Content as StringObject).Value, DragDropEffects.Copy);
+
+                // Если активен режим выболра тегов, осуществить смену значения
+                (SenderItem.Content as StringObject).TagChecked = !(SenderItem.Content as StringObject).TagChecked;
+            }
         }
 
         private void views_Drop(object sender, DragEventArgs e)
@@ -199,21 +248,38 @@ namespace Smetana
 
         private void AcceptChanges_Click(object sender, RoutedEventArgs e)
         {
-            AcceptCancelPanel.Visibility = System.Windows.Visibility.Hidden;
-            TagsButtonsPanel.Visibility = System.Windows.Visibility.Visible;
+            btnOPen.IsChecked = false;
+
+            if (views.SelectedItem != null)
+            {
+                TaggedFile SelectedFile = views.SelectedItem as TaggedFile;
+                if (SelectedFile != null)
+                {
+                    bool fHasChanges = false;
+
+                    foreach(StringObject CurrentTag in LabelsCollection)
+                    {
+                        if(CurrentTag.TagChecked)
+                        {
+                            fHasChanges |= Engine.Get().AssignTag(SelectedFile.FileName, CurrentTag.Value);
+                        }
+                    }
+
+                    if(fHasChanges)
+                    {
+                        LoadFilesList();
+                    }
+                }
+            }
         }
 
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
         {
-            AcceptCancelPanel.Visibility = System.Windows.Visibility.Hidden;
-            TagsButtonsPanel.Visibility = System.Windows.Visibility.Visible;
+            btnOPen.IsChecked = false;
         }
 
         private void btnOPen_Checked(object sender, RoutedEventArgs e)
-        {           
-            AcceptCancelPanel.Visibility = System.Windows.Visibility.Visible;
-            TagsButtonsPanel.Visibility = System.Windows.Visibility.Hidden;
-
+        {   
             // Показать имеющиеся теги
             if(views.SelectedItem != null)
             {
@@ -234,7 +300,8 @@ namespace Smetana
                             }
                         }
                         
-                    }
+                    }                                     
+
                 }
 
             }
@@ -248,6 +315,11 @@ namespace Smetana
             {
                 ClickedTag.TagChecked = !ClickedTag.TagChecked  ;
             }
+        }
+
+        private void btnOPen_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TagAssigmentActive.TagChecked = false;
         }
 
 

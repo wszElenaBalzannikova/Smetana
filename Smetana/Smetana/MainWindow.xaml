@@ -82,7 +82,7 @@
                 IsChecked="{Binding TagChecked}"/> 
         </DataTemplate>
 
-        <DataTemplate x:Key="DynamicCharacterTemplate" DataType="{x:Type src:TaggedFile}" >
+        <DataTemplate x:Key="DynamicCharacterTemplate" DataType="{x:Type src:MainWindow}" >
             <ContentPresenter x:Name="content" ContentTemplate="{StaticResource LabelsListTemplate}" />
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="True" >
@@ -105,7 +105,7 @@
         <ToolBar>
 
             <Button Click="LoadFiles_Click">Загрузить файлы</Button>
-            <ToggleButton  Name="btnOPen" Checked="btnOPen_Checked">Назначить теги</ToggleButton>
+            <ToggleButton  Name="btnOPen" Checked="btnOPen_Checked" Unchecked="btnOPen_Unchecked">Назначить теги</ToggleButton>
             <Button>Close</Button>
             <Separator></Separator>
             <CheckBox FontWeight="Bold">Bold</CheckBox>
@@ -164,6 +164,15 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="True" >
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <DockPanel >
                         <Button Click="btnAddTag_Click">Добавить</Button>
                     </DockPanel>
@@ -213,12 +222,26 @@
                 <!-- End layer 2 -->
                 
                 <!-- Layer 3 Accept/Cancel buttons -->
-                <Grid Name="AcceptCancelPanel" Grid.Row="0" Height="25" Visibility="Hidden">
+                <Grid Name="AcceptCancelPanel" Grid.Row="0" Height="25" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="True" >
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="False" >
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    
                     <DockPanel >
                         <Button Name="AcceptChanges" Click="AcceptChanges_Click" IsDefault="True" >Принять</Button>
                     </DockPanel>
