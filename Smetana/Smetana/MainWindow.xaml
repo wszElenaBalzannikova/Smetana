@@ -104,16 +104,35 @@
 
         <ToolBar>
 
-            <Button Click="LoadFiles_Click">Загрузить файлы</Button>
-            <ToggleButton  Name="btnOPen" Checked="btnOPen_Checked" Unchecked="btnOPen_Unchecked">Назначить теги</ToggleButton>
-            <Button>Close</Button>
-            <Separator></Separator>
-            <CheckBox FontWeight="Bold">Bold</CheckBox>
-            <CheckBox FontStyle="Italic">Italic</CheckBox>
-            <CheckBox>
-                <TextBlock TextDecorations="Underline">Underline</TextBlock>
-            </CheckBox>
-            <Separator></Separator>
+            <Button 
+                Name="btnNewCollection"
+                Click="btnNewCollection_Click">
+                Создать коллекцию
+            </Button>
+            
+            <Button 
+                Name="btnOPenCollection"
+                Click="btnOpenCollection_Click">
+                Открыть коллекцию
+            </Button>
+
+            <Button 
+                Name="btnSaveCollection"
+                Click="btnSaveCollection_Click">
+                Сохранить коллекцию
+            </Button>
+            
+            <Button 
+                Click="LoadFiles_Click">
+                Загрузить файлы
+            </Button>
+            <ToggleButton  
+                Name="btnOPen" 
+                Checked="btnOPen_Checked" 
+                Unchecked="btnOpen_Unchecked">
+                Назначить теги
+            </ToggleButton>
+           
             
         </ToolBar>
 

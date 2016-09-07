@@ -317,9 +317,35 @@ namespace Smetana
             }
         }
 
-        private void btnOPen_Unchecked(object sender, RoutedEventArgs e)
+        private void btnOpen_Unchecked(object sender, RoutedEventArgs e)
         {
             TagAssigmentActive.TagChecked = false;
+        }
+
+        private void btnNewCollection_Click(object sender, RoutedEventArgs e)
+        {
+            //FolderBrowserDialog dlg = new FolderBrowserDialog();
+            //dlg.ShowDialog();
+        }
+
+        private void btnOpenCollection_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog OpenColelctionDialog = new OpenFileDialog();
+            OpenColelctionDialog.ShowDialog();
+            if(OpenColelctionDialog.FileNames.Length == 1)
+            {
+                if(Engine.Get().Restore(OpenColelctionDialog.FileNames[0]))
+                {
+                    LoadFilesList();
+                    LoadTagsList();
+                }
+                
+            }
+        }
+
+        private void btnSaveCollection_Click(object sender, RoutedEventArgs e)
+        {
+            Engine.Get().Store("");
         }
 
 

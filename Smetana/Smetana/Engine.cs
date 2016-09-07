@@ -97,7 +97,7 @@ namespace Smetana
         private Engine()
         {
             this.engine = Python.CreateEngine();
-            this.engine.SetSearchPaths(new[] { @"C:\Users\Elena\Documents\Visual Studio 2013\Projects\Smetana\SmetanaCore" });
+            this.engine.SetSearchPaths(new[] { @"d:\Smetana\Smetana\SmetanaCore", @"d:\Python-3.4.5\Lib" });
             this.scope = this.engine.CreateScope();
 
             this.scope.ImportModule("SmetanaCore");
@@ -106,34 +106,39 @@ namespace Smetana
             this.engine.Execute("appCore = SmetanaCore.ApplicationCore()", this.scope);
             appCore = this.scope.GetVariable("appCore");
 
-                        appCore.LoadFile("File1.ogg");
-            appCore.PrintFiles();
+            //appCore.LoadFile("File1.ogg");
+            //appCore.PrintFiles();
 
-            appCore.CreateTag("Rock");
-            appCore.CreateTag("Jazz");
-            appCore.CreateTag("Metal");
+            //appCore.CreateTag("Rock");
+            //appCore.CreateTag("Jazz");
+            //appCore.CreateTag("Metal");
 
-            appCore.LoadFile("File1.mp3");
+            //appCore.LoadFile("File1.mp3");
 
-            appCore.LoadFile("File2.mp3");
-            appCore.LoadFile("File3.mp3");
-            appCore.LoadFile("File1.mp3");
+            //appCore.LoadFile("File2.mp3");
+            //appCore.LoadFile("File3.mp3");
+            //appCore.LoadFile("File1.mp3");
 
-            appCore.AssignTag("File1.mp3", "Rock");
-            appCore.AssignTag("File1.mp3", "Jazz");
-            appCore.AssignTag("File1.mp3", "Metal");
+            //appCore.AssignTag("File1.mp3", "Rock");
+            //appCore.AssignTag("File1.mp3", "Jazz");
+            //appCore.AssignTag("File1.mp3", "Metal");
 
-            appCore.AssignTag("File2.mp3", "Rock");
-            appCore.AssignTag("File2.mp3", "Jazz");
-            appCore.AssignTag("File3.mp3", "Metal");
-
-            IronPython.Runtime.List q = appCore.QueryFiles("Jazz");
-            string[] AAA = q.Cast<string>().ToArray();
-
-            q = appCore.GetTagsList();
-            AAA = q.Cast<string>().ToArray();
+            //appCore.AssignTag("File2.mp3", "Rock");
+            //appCore.AssignTag("File2.mp3", "Jazz");
+            //appCore.AssignTag("File3.mp3", "Metal");                      
             
+        }
 
+        public bool Store(string ProjectFileName)
+        {
+            appCore.Store("Collection.db");
+            return true;
+        }
+
+        public bool Restore(string ProjectFileName)
+        {
+            appCore.Restore("Collection.db");
+            return true;
         }
              
     }

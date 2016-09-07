@@ -31,15 +31,17 @@ class ApplicationCore(object):
         #Find tag id
         TagId = self.GetTagId(TagName)
         if TagId == 0:
-            result = False
+            return False
         else:
             for x in self.FilesList:
                 if self.FilesList[x].FileName == FileName :
                     if TagId not in self.FilesList[x].TagsList :
                          self.FilesList[x].TagsList.append(TagId)
-                         result = True
+                         self.FilesList[x].TagsList.sort()
+                         return True
+                         
                     break
-        return result
+        return False
 
     def CreateTag(self, TagName):
         
@@ -73,8 +75,56 @@ class ApplicationCore(object):
         for x in self.FilesList:
             if self.FilesList[x].FileName == FileName :
                 return [self.TagsList[x] for x in self.FilesList[x].TagsList]
-                 #return [self.TagsList[i] for i in self.FilesList[x].TagsList]
 
     def GetTagsList(self):
         return self.TagsList.values()
+    
+    # Serialize database
+    def Store(self, FileName):
 
+        # Create FileID -- FileName 
+        FileNames = open(FileName, 'w')
+        FileNames.write("FILES\n");
+        for i in self.FilesList:
+            FileNames.write(str(i) + " " + self.FilesList[i].FileName + "\n")
+        
+        FileNames.write("TAGS\n");
+        # Create TagId -- TagName
+        for i in self.TagsList:
+            FileNames.write(str(i) + " " + self.TagsList[i] + "\n")
+        
+        FileNames.write("LINKS\n");
+        # Create FileId -- TagId
+        for i in self.FilesList:
+            for x in self.FilesList[i].TagsList:
+                FileNames.write(str(i) + " " + str(x) + "\n")
+        
+        FileNames.close()
+
+    def Restore(self, FileName):
+
+        # Open FileID -- FileName 
+        FileNames = open(FileName, 'r')
+        
+        state = ""
+        for CurrLine in FileNames:
+            if "FILES" in CurrLine:
+                state = "FILES"
+            elif "TAGS" in CurrLine:
+                state = "TAGS"
+            elif "LINKS" in CurrLine:
+                state = "LINKS"
+            else :
+                if state == "FILES":
+                    row = CurrLine.split()
+                    self.FilesList[int(row[0])] = TaggedFile(row[1])
+                elif state == "TAGS":
+                    row = CurrLine.split()
+                    self.TagsList[int(row[0])] = row[1]
+                elif state == "LINKS":
+                    row = CurrLine.split()
+                    self.FilesList[int(row[0])].TagsList.append(int(row[1]));
+
+        FileNames.close()
+
+        
