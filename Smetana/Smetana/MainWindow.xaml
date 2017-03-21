@@ -657,7 +657,7 @@
                     <TextBox 
                         Grid.Row="1"  
                         Name="tbNewLabel" 
-                        FontSize="14" 
+                        FontSize="12" 
                         VerticalAlignment="Center" >
                     </TextBox>
                     <Button 

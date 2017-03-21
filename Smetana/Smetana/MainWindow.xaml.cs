@@ -594,28 +594,56 @@ namespace Smetana
 
 			foreach (var SelectedItem in selectedItems)
 			{
-				TaggedFile SelectedFile = SelectedItem.File;
-				if (SelectedFile != null)
+				if (SelectedItem.File != null)
 				{
-					foreach (StringObject CurrentTag in LabelsCollection)
-					{
-						if ((CurrentTag.TagChecked != null) && (CurrentTag.TagChecked.Value))
-						{
-							if(Engine.Get().AssignTag(SelectedFile.FullName, CurrentTag.Value))
-							{
-								// Обновить список тэгов для файла
-								SelectedItem.AssignTagsList(Engine.Get().GetFileTags(SelectedFile.FullName));
-								fHasChanges = true;
-							}
-						}
-					}
+                    fHasChanges = UpdateFileItem(SelectedItem);
 				}
+                // Обойти файлы в каталоге
+                else
+                {
+                    fHasChanges = UpdateFolderItem(SelectedItem);
+                }
 			}
 
  			if (fHasChanges)
  			{
  				UpdateCollectionTree();
  			}
+        }
+
+        private bool UpdateFolderItem(CollectionFolder SelectedItem)
+        {
+            bool fHasChanges = false;
+            foreach (var CurrSubitem in SelectedItem.Subfolders)
+            {
+                if(CurrSubitem.File == null)
+                {
+                    fHasChanges |= UpdateFolderItem(CurrSubitem);
+                }
+                else
+                {
+                    fHasChanges |= UpdateFileItem(CurrSubitem);
+                }
+            }
+            return fHasChanges;
+        }
+
+        private bool UpdateFileItem(CollectionFolder SelectedItem)
+        {
+            bool fHasChanges = false; 
+            foreach (StringObject CurrentTag in LabelsCollection)
+            {
+                if ((CurrentTag.TagChecked != null) && (CurrentTag.TagChecked.Value))
+                {
+                    if (Engine.Get().AssignTag(SelectedItem.File.FullName, CurrentTag.Value))
+                    {
+                        // Обновить список тэгов для файла
+                        SelectedItem.AssignTagsList(Engine.Get().GetFileTags(SelectedItem.File.FullName));
+                        fHasChanges = true;
+                    }
+                }
+            }
+            return fHasChanges;
         }
 
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
@@ -635,55 +663,97 @@ namespace Smetana
 			{
 				List<string> IntersectedTags = new List<string>();
 				List<string> UnintersectedTags = new List<string>();
-				if(selectedItems.Count == 1)
+				if((selectedItems.Count == 1) && (selectedItems[0].File != null))
 				{
-					string[] SelectedFileTags = Engine.Get().GetFileTags(selectedItems[0].File.FullName);
-					IntersectedTags.AddRange(SelectedFileTags);
+                    string[] SelectedFileTags = Engine.Get().GetFileTags(selectedItems[0].File.FullName);
+                    IntersectedTags.AddRange(SelectedFileTags);
 				}
 				else
 				{
 					foreach (var SelectedItem in selectedItems)
 					{
-						TaggedFile SelectedFile = SelectedItem.File;
-						if (SelectedFile != null)
-						{
-							string[] SelectedFileTags = Engine.Get().GetFileTags(SelectedFile.FullName);
-
-							// Список пустой, заполнить его данными первого файла
-							if (IntersectedTags.Count == 0)
-							{
-								IntersectedTags.AddRange(SelectedFileTags);
-								UnintersectedTags.AddRange(SelectedFileTags);
-							}
-							else
-							{
-								// Создать временный список
-								IntersectedTags = new List<string>(SelectedFileTags.Intersect(IntersectedTags));
-								UnintersectedTags = new List<string>(SelectedFileTags.Union(UnintersectedTags).Except(SelectedFileTags.Intersect(UnintersectedTags)));
-							}
-						}
+                        ProcessItemTags(ref IntersectedTags, ref UnintersectedTags, SelectedItem);
 					}
 				}
+
+                foreach (StringObject ListedTag in LabelsCollection)
+                {
+                    ListedTag.TagChecked = false;
+                }
 
 				// Отметить теги, которые есть у всех файлов
-				foreach (StringObject ListedTag in LabelsCollection)
-				{
-					ListedTag.TagChecked = false;
-					if (IntersectedTags.Contains(ListedTag.Value))
-					{
-						ListedTag.TagChecked = true;
-					}			
-				}
+                if (IntersectedTags.Count != 0)
+                {
+                    foreach (StringObject ListedTag in LabelsCollection)
+                    {
+                        if (IntersectedTags.Contains(ListedTag.Value))
+                        {
+                            ListedTag.TagChecked = true;
+                        }
+                    }
+                }
 
-				foreach (StringObject ListedTag in LabelsCollection)
-				{
-					if (UnintersectedTags.Contains(ListedTag.Value))
-					{
-						ListedTag.TagChecked = null;
-					}
-				}
+                if (UnintersectedTags.Count != 0)
+                {
+                    foreach (StringObject ListedTag in LabelsCollection)
+                    {
+                        if (UnintersectedTags.Contains(ListedTag.Value))
+                        {
+                            ListedTag.TagChecked = null;
+                        }
+                    }
+                }
 			}
 
+        }
+
+        private static void ProcessItemTags(
+            ref List<string> IntersectedTags, 
+            ref List<string> UnintersectedTags, 
+            CollectionFolder SelectedItem)
+        {
+            if (SelectedItem.File != null)
+            {
+                ProcessFileItemTag(ref IntersectedTags, ref UnintersectedTags, SelectedItem.File);
+            }
+            else
+            {
+                ProcessFolderItemTag(ref IntersectedTags, ref UnintersectedTags, SelectedItem);
+            }
+        }
+        private static void ProcessFolderItemTag(
+            ref List<string> IntersectedTags, 
+            ref List<string> UnintersectedTags, 
+            CollectionFolder SelectedItem)
+        {
+            foreach(TaggedFile CurrentSubItem in SelectedItem.GetFileItemsList())
+            {
+                ProcessFileItemTag(
+                    ref IntersectedTags, 
+                    ref UnintersectedTags,
+                    CurrentSubItem);
+            }
+        }
+
+        private static void ProcessFileItemTag(
+            ref List<string> IntersectedTags, 
+            ref List<string> UnintersectedTags,
+            TaggedFile SelectedFile)
+        {
+            string[] SelectedFileTags = Engine.Get().GetFileTags(SelectedFile.FullName);
+
+            // Список пустой, заполнить его данными первого файла
+            if (IntersectedTags.Count == 0)
+            {
+                IntersectedTags.AddRange(SelectedFileTags);
+                UnintersectedTags.AddRange(SelectedFileTags);
+            }
+            else
+            {
+                // Создать временный список
+                IntersectedTags = new List<string>(SelectedFileTags.Intersect(IntersectedTags));
+                UnintersectedTags = new List<string>(SelectedFileTags.Union(UnintersectedTags).Except(SelectedFileTags.Intersect(UnintersectedTags)));
+            }
         }
 
         private void btnOpen_Unchecked(object sender, RoutedEventArgs e)
