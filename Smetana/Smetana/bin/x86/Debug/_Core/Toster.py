@@ -1,19 +1,11 @@
-﻿#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import binascii
-
-from  SmetanaCore import *
+﻿from  SmetanaCore import *
 
 if __name__ == "__main__":
-
-    FileName = 'hello world'
-    crc = binascii.crc32(FileName.encode('utf-8'))
 
     appCore = ApplicationCore()
     appCore.CreateCollection("Collection")
   
-    appCore.LoadFile("D:\\downloads\\Grizzly Knows No Remorse - дискография\\2009 Flashback 'N' Hangover (Demo)\\01 Walking Dead");
+    appCore.LoadFile("File1.mp3");
     appCore.LoadFile("File2.mp3");
     appCore.LoadFile("File3.mp3");
     appCore.LoadFile("File1.mp3");
@@ -38,14 +30,14 @@ if __name__ == "__main__":
     
     appCore.Store()
 
-    #print(appCore.GetCollectionsList())
+    print(appCore.GetCollectionsList())
 
-    #print(appCore.GetSimilarTags("1"))
+    print(appCore.GetSimilarTags("1"))
     appCore.Close();
     
     appCore.OpenCollection("Collection")
-    appCore.Restore()
-    appCore.PrintFiles();
+    #appCore.Restore("File1.db")
+    """appCore.PrintFiles();
 
     appCore.LoadFile("File4.mp3");
     appCore.LoadFile("File5.mp3");
@@ -59,5 +51,5 @@ if __name__ == "__main__":
     appCore.AssignTag("File6.mp3", "Special")
 
     appCore.PrintFiles();
-   
+    """
 

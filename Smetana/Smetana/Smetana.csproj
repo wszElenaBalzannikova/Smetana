@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -23,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -72,6 +75,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>smt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IronPython, Version=2.7.5.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
@@ -125,9 +131,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CanOpenner.cs" />
+    <Compile Include="Collection.cs" />
+    <Compile Include="CollectionFolder.cs" />
+    <Compile Include="CollectionsList.cs" />
+    <Compile Include="CollectionsWindow.xaml.cs">
+      <DependentUpon>CollectionsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LoadDirectory.xaml.cs">
+      <DependentUpon>LoadDirectory.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Native.cs" />
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="TaggedFile.cs" />
     <Compile Include="TaggeFilesCollection.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="TreeViewMultipleSelectionAttached.cs" />
+    <Page Include="CollectionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoadDirectory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -159,6 +190,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -168,6 +203,68 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="smt.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\add_mul.png" />
+    <Resource Include="Img\change.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ToDoList.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\10.png" />
+    <Resource Include="Img\11.png" />
+    <Resource Include="Img\21.png" />
+    <Resource Include="Img\22.png" />
+    <Resource Include="Img\23.png" />
+    <Resource Include="Img\24%281%29.png" />
+    <Resource Include="Img\24.png" />
+    <Resource Include="Img\28.png" />
+    <Resource Include="Img\32.png" />
+    <Resource Include="Img\33.png" />
+    <Resource Include="Img\35.png" />
+    <Resource Include="Img\36.png" />
+    <Resource Include="Img\37.png" />
+    <Resource Include="Img\38%281%29.png" />
+    <Resource Include="Img\38.png" />
+    <Resource Include="Img\4.png" />
+    <Resource Include="Img\5.png" />
+    <Resource Include="Img\6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\add_tag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\rem_tag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\edit_tag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\smt.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

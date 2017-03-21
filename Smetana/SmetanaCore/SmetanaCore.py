@@ -1,130 +1,101 @@
-﻿from TaggedFile import TaggedFile
-from FileTag import FileTag
+﻿#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+from Collection import Collection
+
 
 class ApplicationCore(object):
     def __init__(self):
-        self.FilesList = {}
-        self.TagsList = {}
-        self.FreeFileId = 0
-        self.FreeTagId = 0
+        self.CollectionsList = []
+        self.CurrentCollection = 0
 
-    #def LoadFolder(self, FolderName):
+        # Open maindatabase file
+        try:
+            SmetanaDatabase = open("Smetana.db", "r")
+            for CollectionName in SmetanaDatabase:
+                self.CollectionsList.append(Collection(CollectionName[:-1]))
+                            
+        except:
+            SmetanaDatabase = open("Smetana.db", "w")
 
-    def LoadFile(self, FileName):
-                
-        if FileName not in [self.FilesList[x].FileName for x in self.FilesList]:
-            self.FreeFileId += 1
-            self.FilesList[self.FreeFileId] = TaggedFile(FileName)
-            return True
+        SmetanaDatabase.close()
 
-        return False
+    def CreateCollection(self, CollectionName):
+        # Create new collection
+        self.CurrentCollection = Collection(CollectionName)
 
-    def GetTagId(self, OtherTagName):
-        for TagId, TagName in self.TagsList.items():
-            if TagName == OtherTagName:
-                return TagId;
-        return 0
-
-    def AssignTag(self, FileName, TagName):
-        result = False
-
-        #Find tag id
-        TagId = self.GetTagId(TagName)
-        if TagId == 0:
-            return False
-        else:
-            for x in self.FilesList:
-                if self.FilesList[x].FileName == FileName :
-                    if TagId not in self.FilesList[x].TagsList :
-                         self.FilesList[x].TagsList.append(TagId)
-                         self.FilesList[x].TagsList.sort()
-                         return True
-                         
-                    break
-        return False
-
-    def CreateTag(self, TagName):
-        
-        if(TagName not in self.TagsList):
-            self.FreeTagId += 1
-            self.TagsList[self.FreeTagId] = TagName
-            return True;
-        return False
-
-    def RenameLabel(self, OldTagName, NewTagName):
-        if(OldTagName in self.TagsList and NewTagName not in self.TagsList and OldTagName != NewTagName):
-            self.TagsList.remove(OldTagName)
-            self.TagsList.append(NewTagName)
-            return True
-        return False
-
-    def PrintFiles(self):
-        for x in self.FilesList:
-            print(self.FilesList[x].FileName, [self.TagsList[x] for x in self.FilesList[x].TagsList])
+        # Put new collection into list
+        self.CollectionsList.append(self.CurrentCollection)
         return
 
+    def OpenCollection(self, CollectionName):
+        for CurCollection in self.CollectionsList:
+            if CurCollection._CollectionName == CollectionName:
+
+                if self.CurrentCollection != 0:
+                    self.CurrentCollection.Store()
+                    self.CurrentCollection.Dispose()
+                self.CurrentCollection = CurCollection
+                self.CurrentCollection.Restore()
+                return
+
+        self.CreateCollection(CollectionName)
+        return
+
+    def GetCollectionsList(self):
+        return [x._CollectionName for x in self.CollectionsList]
+
+    def Close(self):
+        try:
+
+            self.CurrentCollection.Store()
+
+            SmetanaDatabase = open("Smetana.db", "w")
+            for CollectionName in self.CollectionsList:
+                SmetanaDatabase.write(CollectionName._CollectionName + "\n")
+            SmetanaDatabase.close()
+            return True                
+        except:
+            return False
+
+
+    def LoadFile(self, FileName):                
+        return self.CurrentCollection.LoadFile(FileName)
+
+    def AssignTag(self, FileName, TagName):
+        return self.CurrentCollection.AssignTag(FileName, TagName)
+
+    def CreateTag(self, TagName):        
+        return self.CurrentCollection.CreateTag(TagName)
+
+    def RenameTag(self, OldTagName, NewTagName):
+       return self.CurrentCollection.RenameTag(OldTagName, NewTagName)
+
+    def PrintFiles(self):
+         return self.CurrentCollection.PrintFiles()
+
     def QueryFiles(self, TagName):
-        for i in self.TagsList:
-            if self.TagsList[i] == TagName:
-                return [self.FilesList[x].FileName for x in self.FilesList if i in self.FilesList[x].TagsList]
+         return self.CurrentCollection.QueryFiles(TagName)
 
     def QueryAllFiles(self):
-        return [self.FilesList[x].FileName for x in self.FilesList]
+        return self.CurrentCollection.QueryAllFiles()
 
     def GetFileTags(self, FileName):
-        for x in self.FilesList:
-            if self.FilesList[x].FileName == FileName :
-                return [self.TagsList[x] for x in self.FilesList[x].TagsList]
+        return self.CurrentCollection.GetFileTags(FileName)
 
     def GetTagsList(self):
-        return self.TagsList.values()
+        return self.CurrentCollection.GetTagsList()
     
+    def GetSimilarTags(self, TagName):
+         return self.CurrentCollection.GetSimilarTags(TagName)
+
+    def RemoveFile(self, FileName):
+         return self.CurrentCollection.RemoveFile(FileName)
+
     # Serialize database
-    def Store(self, FileName):
+    def Store(self):
+        return self.CurrentCollection.Store()
 
-        # Create FileID -- FileName 
-        FileNames = open(FileName, 'w')
-        FileNames.write("FILES\n");
-        for i in self.FilesList:
-            FileNames.write(str(i) + " " + self.FilesList[i].FileName + "\n")
-        
-        FileNames.write("TAGS\n");
-        # Create TagId -- TagName
-        for i in self.TagsList:
-            FileNames.write(str(i) + " " + self.TagsList[i] + "\n")
-        
-        FileNames.write("LINKS\n");
-        # Create FileId -- TagId
-        for i in self.FilesList:
-            for x in self.FilesList[i].TagsList:
-                FileNames.write(str(i) + " " + str(x) + "\n")
-        
-        FileNames.close()
-
-    def Restore(self, FileName):
-
-        # Open FileID -- FileName 
-        FileNames = open(FileName, 'r')
-        
-        state = ""
-        for CurrLine in FileNames:
-            if "FILES" in CurrLine:
-                state = "FILES"
-            elif "TAGS" in CurrLine:
-                state = "TAGS"
-            elif "LINKS" in CurrLine:
-                state = "LINKS"
-            else :
-                if state == "FILES":
-                    row = CurrLine.split()
-                    self.FilesList[int(row[0])] = TaggedFile(row[1])
-                elif state == "TAGS":
-                    row = CurrLine.split()
-                    self.TagsList[int(row[0])] = row[1]
-                elif state == "LINKS":
-                    row = CurrLine.split()
-                    self.FilesList[int(row[0])].TagsList.append(int(row[1]));
-
-        FileNames.close()
-
-        
+    def Restore(self):
+        return self.CurrentCollection.Restore()

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
 using Microsoft.Win32;
+using System.IO;
 
 namespace Smetana
 {
@@ -17,6 +18,22 @@ namespace Smetana
         private ScriptScope scope;
         private dynamic appCore;
 
+		private Engine()
+		{
+			this.engine = Python.CreateEngine();
+            // d:\Smetana\Smetana\SmetanaCore\
+			// @"f:\WORK\Smetana\Smetana\SmetanaCore"
+            //  Directory.GetCurrentDirectory() + "\\Core"
+			this.engine.SetSearchPaths(new[] { Directory.GetCurrentDirectory() + "\\Core" });
+			this.scope = this.engine.CreateScope();
+
+			this.scope.ImportModule("SmetanaCore");
+
+			// appCore = ApplicationCore()
+			this.engine.Execute("appCore = SmetanaCore.ApplicationCore()", this.scope);
+			appCore = this.scope.GetVariable("appCore");
+		}
+
         public static Engine Get()
         {
             if(_instance == null)
@@ -24,6 +41,23 @@ namespace Smetana
 
             return _instance;
         }
+
+		public string[] GetCollectionsList()
+		{
+			IronPython.Runtime.List CollectionsList = appCore.GetCollectionsList();
+
+			string[] FileNames = new string[CollectionsList.__len__()];
+			int i = 0;
+
+			foreach (var CurrKey in CollectionsList)
+			{
+				FileNames[i] = CurrKey as string;
+				i++;
+			}
+
+			return FileNames;
+
+		}
 
         public string[] GetFilesList()
         {
@@ -76,13 +110,18 @@ namespace Smetana
 
         public bool LoadFile(string FileName)
         {
-            return appCore.LoadFile(FileName);
+           return appCore.LoadFile(FileName);
         }
 
         public bool CreateTag(string TagName)
         {
             return appCore.CreateTag(TagName);
         }
+
+		public bool RenameTag(string OldTagName, string NewTagName)
+		{
+			return appCore.RenameTag(OldTagName, NewTagName);
+		}
 
         public bool AssignTag(string FileName, string TagName)
         {
@@ -94,52 +133,49 @@ namespace Smetana
             return appCore.RenameLabel(OldTagName, NewTagName);
         }
 
-        private Engine()
+       
+
+        public bool Store()
         {
-            this.engine = Python.CreateEngine();
-            this.engine.SetSearchPaths(new[] { @"d:\Smetana\Smetana\SmetanaCore", @"d:\Python-3.4.5\Lib" });
-            this.scope = this.engine.CreateScope();
-
-            this.scope.ImportModule("SmetanaCore");
-
-            // appCore = ApplicationCore()
-            this.engine.Execute("appCore = SmetanaCore.ApplicationCore()", this.scope);
-            appCore = this.scope.GetVariable("appCore");
-
-            //appCore.LoadFile("File1.ogg");
-            //appCore.PrintFiles();
-
-            //appCore.CreateTag("Rock");
-            //appCore.CreateTag("Jazz");
-            //appCore.CreateTag("Metal");
-
-            //appCore.LoadFile("File1.mp3");
-
-            //appCore.LoadFile("File2.mp3");
-            //appCore.LoadFile("File3.mp3");
-            //appCore.LoadFile("File1.mp3");
-
-            //appCore.AssignTag("File1.mp3", "Rock");
-            //appCore.AssignTag("File1.mp3", "Jazz");
-            //appCore.AssignTag("File1.mp3", "Metal");
-
-            //appCore.AssignTag("File2.mp3", "Rock");
-            //appCore.AssignTag("File2.mp3", "Jazz");
-            //appCore.AssignTag("File3.mp3", "Metal");                      
-            
-        }
-
-        public bool Store(string ProjectFileName)
-        {
-            appCore.Store("Collection.db");
+            appCore.Store();
             return true;
         }
 
-        public bool Restore(string ProjectFileName)
+        public bool OpenCollection(string ProjectFileName)
         {
-            appCore.Restore("Collection.db");
+			appCore.OpenCollection(ProjectFileName);
             return true;
         }
+
+		public string[] QueryFiles(string TagName)
+		{
+			IronPython.Runtime.List TagsCollection =  appCore.QueryFiles(TagName);
+			if(TagsCollection == null)
+			{
+				return null;
+			}
+
+			string[] FileNames = new string[TagsCollection.__len__()];
+			int i = 0;
+
+			foreach (var CurrKey in TagsCollection)
+			{
+				FileNames[i] = CurrKey as string;
+				i++;
+			}
+
+			return FileNames;
+		}
+
+		public void RemoveFile(string FileName)
+		{
+			appCore.RemoveFile(FileName);
+		}
+
+		public bool Close()
+		{
+			return appCore.Close();
+		}
              
     }
 }

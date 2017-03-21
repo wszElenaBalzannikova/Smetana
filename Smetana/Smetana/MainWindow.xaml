@@ -2,11 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:src="clr-namespace:Smetana"        
-        Title="MainWindow" Height="350" Width="525">
+        xmlns:src="clr-namespace:Smetana"    
+        Title="MainWindow" Height="350" Width="643" WindowState="Maximized" Icon="smt.ico">
 
     <Window.Resources>
-
 
 
         <Style x:Key="ResizeFont">
@@ -17,7 +16,7 @@
                             <Storyboard>
                                 <DoubleAnimation Duration="0:0:0.2"
                                                  Storyboard.TargetProperty="FontSize"
-                                                 To="14">
+                                                 To="12">
                                 </DoubleAnimation>
                             </Storyboard>
                         </BeginStoryboard>
@@ -38,17 +37,18 @@
         </Style>
 
 
-     
+
         <DataTemplate x:Key="TileTemplate" >
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <!--Image Grid.Column="0" Height="90" Stretch="Uniform" Source="{Binding Image}" /-->
-                <StackPanel Grid.Column="1" Margin="2,0" VerticalAlignment="Center">
+
+
+                <StackPanel Grid.Column="1">
                     <StackPanel Orientation="Vertical" TextBlock.FontSize="12" TextBlock.FontWeight="Bold">
-                        <Label Content="{Binding FileName}"  Style="{StaticResource ResizeFont}" />
+                        <Label Content="{Binding FolderName}"  Style="{StaticResource ResizeFont}" />
 
                         <ItemsControl ItemsSource="{Binding Labels}" Grid.Row=" 1" >
 
@@ -60,14 +60,14 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Label Content="{Binding Value}" Style="{StaticResource ResizeFont}" Foreground = "Red" VerticalAlignment="Center" Margin="1,0,0,0" Background="#008FE0E0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
+                                    <Label Content="{Binding Value}" FontSize="12" Foreground = "DarkCyan" VerticalAlignment="Center" Margin="1,0,0,0" Background="#008FE0E0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
                     </StackPanel>
                 </StackPanel>
-            </Grid>
+            </Grid>            
         </DataTemplate>
 
 
@@ -79,62 +79,135 @@
         <DataTemplate x:Key="LabelsCheckTemplate" DataType="{x:Type src:MainWindow}">
             <CheckBox 
                 Content="{Binding Value}"  
-                IsChecked="{Binding TagChecked}"/> 
+                IsChecked="{Binding TagChecked}" 
+                IsThreeState="True"/>
         </DataTemplate>
 
         <DataTemplate x:Key="DynamicCharacterTemplate" DataType="{x:Type src:MainWindow}" >
             <ContentPresenter x:Name="content" ContentTemplate="{StaticResource LabelsListTemplate}" />
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding ElementName=btnOPen, Path=IsChecked }" Value="True" >
+                <DataTrigger Binding="{Binding ElementName=btnSetTags, Path=IsChecked }" Value="True" >
                     <Setter TargetName="content" Property="ContentTemplate" Value="{StaticResource LabelsCheckTemplate}" />
                 </DataTrigger>
-                
+
             </DataTemplate.Triggers>
         </DataTemplate>
-        
 
+
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FF737B7F"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        
+        <Style x:Key="MyButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid SnapsToDevicePixels="true">
+                            <Rectangle x:Name="BackgroundVisual" Fill="{TemplateBinding Background}"/>
+                            <Rectangle x:Name="PressedVisual" Fill="{TemplateBinding Background}" Opacity="0"/>
+                            <Rectangle x:Name="DisabledVisual" Fill="{DynamicResource Button.Disabled.Background}" Opacity="0"/>
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true"/>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Opacity" TargetName="BackgroundVisual" Value="0.6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Opacity" TargetName="PressedVisual" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                <Setter Property="Opacity" TargetName="DisabledVisual" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="MyToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid SnapsToDevicePixels="true">
+                            <Rectangle x:Name="BackgroundVisual" Fill="{TemplateBinding Background}"/>
+                            <Rectangle x:Name="PressedVisual" Fill="{TemplateBinding Background}" Opacity="0"/>
+                            <Rectangle x:Name="DisabledVisual" Fill="{DynamicResource Button.Disabled.Background}" Opacity="0"/>
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Opacity" TargetName="BackgroundVisual" Value="0.6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Opacity" TargetName="PressedVisual" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                <Setter Property="Opacity" TargetName="DisabledVisual" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+
+        <!-- Commands -->
+        <RoutedUICommand x:Key="ExitProgram" Text="Exit" />
+        <!--RoutedUICommand x:Key="MyCommand2" Text="Another Text" /-->
+        
     </Window.Resources>
 
-    <Grid>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource ExitProgram}" 
+                    Executed="FirstMethod" />
+    </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Key="F4" Modifiers="Ctrl" Command="{StaticResource ExitProgram}" />
+    </Window.InputBindings>
+    
+    <Grid Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition ></RowDefinition>
         </Grid.RowDefinitions>
-        <!--Image HorizontalAlignment="Stretch" Width="Auto" Source="Images\ToolBarGradient.png" Stretch="Fill" x:Name="ToolBarImage"/-->
 
-        <ToolBar>
+        
 
-            <Button 
-                Name="btnNewCollection"
-                Click="btnNewCollection_Click">
-                Создать коллекцию
-            </Button>
-            
-            <Button 
-                Name="btnOPenCollection"
-                Click="btnOpenCollection_Click">
-                Открыть коллекцию
-            </Button>
-
-            <Button 
-                Name="btnSaveCollection"
-                Click="btnSaveCollection_Click">
-                Сохранить коллекцию
-            </Button>
-            
-            <Button 
-                Click="LoadFiles_Click">
-                Загрузить файлы
-            </Button>
-            <ToggleButton  
-                Name="btnOPen" 
-                Checked="btnOPen_Checked" 
-                Unchecked="btnOpen_Unchecked">
-                Назначить теги
-            </ToggleButton>
-           
-            
-        </ToolBar>
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
@@ -145,43 +218,336 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="0.36*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Row="0">
 
-                <ListView 
-                Name="views"   
-                ItemsSource="{Binding Components, Mode=OneWay}" 
-                ItemTemplate="{StaticResource TileTemplate}" 
-                DockPanel.Dock="Left" 
-                AllowDrop="True">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
+            <Grid
+                 Grid.Row=" 1" 
+                Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition ></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <!-- 11111111111111111 -->
+                <Grid 
+            Background="Teal">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <!-- Group1 -->
+
+
+                    <Grid 
+                Panel.ZIndex="1" 
+                Name="MainMenuPanelDetails"
+                MouseLeave="Gropu1_MouseLeave">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <!-- Button 1.11 -->
+                        <Button 
+                   Name="SaveCollectionButton"
+                    Grid.Row="0"
+                    Grid.Column="0" 
+                    BorderBrush="{x:Null}"
+                    ToolTip="Сохранить коллекцию"
+                    Click="btnSaveCollection_Click"
+                     Style="{StaticResource MyButtonStyle}"
+                    >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/11.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 1.12 -->
+                        <Button 
+                    Name="ChangeCollectionButton"
+                    Grid.Row="0"
+                    Grid.Column="1" BorderBrush="{x:Null}"
+                    ToolTip="Сменить коллекцию"
+                    Click="btnChangeCollection_Click"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/28.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 1.21 -->
+                        <Button 
+                    Name="RenameCollectionButton"
+                    Grid.Row="0"
+                    Grid.Column="2" 
+                    BorderBrush="{x:Null}"
+                    ToolTip="Переименовать коллекцию"
+                    Click="btnRenameCollection_Click"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/24(1).png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 1.22 -->
+                        <Button 
+                    Name="ExitButton"
+                    Grid.Row="0"
+                    Grid.Column="3" BorderBrush="{x:Null}"
+                    ToolTip="Выход"
+                    Command="{StaticResource ExitProgram}"
+                    Style="{StaticResource MyButtonStyle}"
+                        >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/24.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+                    </Grid>
+
+                    <DockPanel 
+                Grid.Column="0" 
+                Panel.ZIndex="2" 
+                Name="CollectionMenuPanelGeneral"
+                MouseEnter="Group1_MouseEnter"
+                >
+                        <Button                         
+                    Name="btnChangeCollection"
+                    Width="160"
+                    Height="40" 
+                    Background="Teal" 
+                    BorderBrush="#FF063E39" 
+                    BorderThickness="2"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            Коллекция
+                        </Button>
+                    </DockPanel>
+
+                    <!-- Group2 -->
+                    <Grid 
+                Panel.ZIndex="1" 
+                Name="CollectionMenuPanelDetails"
+                Grid.Column="1" 
+                MouseLeave="Group2_MouseLeave"
+                >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <!-- Button 2.11 -->
+                        <Button 
+                    Name="AddFileButton"
+                    Grid.Row="0"
+                    Grid.Column="0" BorderBrush="{x:Null}"
+                    ToolTip="Загрузить файлы"
+                    Click="LoadFiles_Click"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/37.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 2.12 -->
+                        <Button 
+                    Grid.Row="0"
+                    Grid.Column="1" 
+                    BorderBrush="{x:Null}"
+                    Name="LoadDirectoryButton"
+                    ToolTip="Загрузить каталог"
+                    Click="LoadDirectoryButton_Click"
+                     Style="{StaticResource MyButtonStyle}"
+                        >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/21.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 2.13 -->
+                        <Button 
+                    Name="RemoveFilesButton"
+                    Grid.Row="0"
+                    Grid.Column="2" 
+                    BorderBrush="{x:Null}"
+                    ToolTip="Удалить файлы"
+                    Click="RemoveFilesButton_Click"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/38(1).png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 2.21 -->
+                        <Button 
+                    Name="MoveFilesButton"
+                    Grid.Row="0"
+                    Grid.Column="3" 
+                    BorderBrush="{x:Null}"
+                    Click="MoveFilesButton_Click"
+                    ToolTip="Указать другое расположение файлов"
+                    Style="{StaticResource MyButtonStyle}"
+                        >
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/22.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
+
+                        <!-- Button 2.22 -->
+                        <ToggleButton 
+                    Name="ShowTaggedFilesButton"
+                    Grid.Row="0"
+                    Grid.Column="4" 
+                    BorderBrush="{x:Null}"
+                    ToolTip="Показать файлы с метками"
+                    Style="{StaticResource MyToggleButtonStyle}"
+                    Checked="ShowTaggedFilesButton_Checked"
+                    Unchecked="ShowTaggedFilesButton_Unchecked"
+                    IsChecked="True"
+                        >
+                            <ToggleButton.Background>
+                                <ImageBrush ImageSource="Img/23.png" Stretch="Fill"/>
+                            </ToggleButton.Background>
+                        </ToggleButton>
+
+                        <!-- Button 2.23 -->
+                        <ToggleButton 
+                    Name="ShowUntaggedFilesButton"
+                    Grid.Row="0"
+                    Grid.Column="5" 
+                    BorderBrush="{x:Null}"
+                    ToolTip="Показать файлы без меток"
+                    Style="{StaticResource MyToggleButtonStyle}"                    
+                    Checked="ShowUntaggedFilesButton_Checked"
+                    Unchecked="ShowUntaggedFilesButton_Unchecked" 
+                    IsChecked="True"
+                    >
+                            <ToggleButton.Background>
+                                <ImageBrush ImageSource="Img/23.png" Stretch="Fill"/>
+                            </ToggleButton.Background>
+                        </ToggleButton>
+                    </Grid>
+
+                    <DockPanel 
+                Name="FilesMenuPanel"
+                Grid.Column="1"
+                Panel.ZIndex="2"
+                MouseEnter="Group1_MouseEnter"
+                >
+                        <Button 
+                    Name="btnSaveCollection"
+                    Height="40" 
+                    Width="240"
+                    Background="Teal" 
+                    BorderBrush="#FF063E39"
+                    BorderThickness="2"
+                    Style="{StaticResource MyButtonStyle}"
+                    >
+                            Файлы
+                        </Button>
+                    </DockPanel>                    
+                </Grid>
+                <TextBox 
+                    Grid.Row="1" 
+                    Name="TagSearchBox" 
+                    KeyUp="TagSearchBox_KeyUp">
+                    
+                </TextBox>
+
+                <!--  ItemTemplate="{StaticResource TileTemplate}" -->
+                <TreeView 
+                    Grid.Row="2"
+                    Name="views"   
+                    ItemsSource="{Binding Components, Mode=OneWay}"                    
+                    DockPanel.Dock="Right" 
+                    AllowDrop="True" 
+                    KeyDown="views_KeyDown"
+                    Drop="views_DropToList"
+                    >
+                        
+                        <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding SubfoldersView}">
+                            
+                                
+                                    <StackPanel 
+                                        Grid.Column="0" 
+                                        Orientation="Vertical" 
+                                        TextBlock.FontSize="12" 
+                                        TextBlock.FontWeight="Bold"
+                                        Background="{Binding BackColor, Mode=OneWay}">
+
+                                        <Label Content="{Binding FolderName}"  Style="{StaticResource ResizeFont}" />
+
+                                        <ItemsControl ItemsSource="{Binding Labels}" Grid.Row=" 1" >
+
+                                            <ItemsControl.ItemsPanel >
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding Value}" FontSize="12" Foreground = "DarkCyan" VerticalAlignment="Center" Margin="1,0,0,0" Background="#008FE0E0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>  
+                            
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                                        
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
                             <EventSetter Event="Drop" Handler="views_Drop" />
                             <EventSetter Event="DragEnter" Handler="views_DropEnter" />
                             <EventSetter Event="DragLeave" Handler="views_DropLeave" />
+                            <EventSetter Event="MouseDoubleClick" Handler="views_MouseDoubleClick" />
+                            <EventSetter Event="MouseMove" Handler="views_MouseMove" />
+                            <Setter  Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
+                            <Setter Property="Visibility" Value="{Binding IsVisible, Mode=OneWay}"></Setter>
                         </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
+                    </TreeView.ItemContainerStyle>
+                </TreeView>
+            </Grid>
 
 
-            </DockPanel>
-          
             <Grid
                 Grid.Row=" 1" 
                 Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition Height="40"></RowDefinition>
+                    <RowDefinition Height="Auto" ></RowDefinition>
                     <RowDefinition ></RowDefinition>
-                    
+
                 </Grid.RowDefinitions>
-                
+
                 <!-- Layer 1  main buttons -->
-                <Grid Name="TagsButtonsPanel" Grid.Row="0" Height="25">
+                <Grid Name="TagsButtonsPanel" Grid.Row="0" Height="40" Background="teal">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition ></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.Style>
                         <Style TargetType="{x:Type Grid}">
@@ -193,55 +559,181 @@
                         </Style>
                     </Grid.Style>
                     <DockPanel >
-                        <Button Click="btnAddTag_Click">Добавить</Button>
+                        <Button 
+                            Click="btnAddTag_Click" 
+                            Width="40"
+                            Style="{StaticResource MyButtonStyle}"
+                            ToolTip="Добавить метку">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/add_tag.png" Stretch="Uniform" AlignmentX="Left"/>
+                            </Button.Background>
+                        </Button>
                     </DockPanel>
                     <GridSplitter 
                         Grid.Row="0" 
                         Grid.Column="1" 
                         Grid.RowSpan="2" 
-                        Width="5"
+                        Width="2"
                         VerticalAlignment="Stretch" 
-                        HorizontalAlignment="Center">
+                        HorizontalAlignment="Center"
+                        Background="#FF006464">
                     </GridSplitter>
                     <DockPanel Grid.Column="2">
-                        <Button>Переименовать</Button>
+                        <Button 
+                            Click="RenameTag_Click" 
+                            Width="40"
+                            Style="{StaticResource MyButtonStyle}"
+                            ToolTip="Переименовать метку">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/edit_tag.png" Stretch="Uniform" AlignmentX="Left"/>
+                            </Button.Background>
+                        </Button>
                     </DockPanel>
                     <GridSplitter 
                         Grid.Row="0" 
                         Grid.Column="3" 
                         Grid.RowSpan="2" 
-                        Width="5"
+                        Width="2"
                         VerticalAlignment="Stretch" 
-                        HorizontalAlignment="Center">
+                        HorizontalAlignment="Center"
+                        Background="#FF006464">
                     </GridSplitter>
                     <DockPanel Grid.Column="4">
-                        <Button>Удалить</Button>
+                        <Button 
+                            Width="40"
+                            Style="{StaticResource MyButtonStyle}"
+                            ToolTip="Удалить метку">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Img/rem_tag.png" Stretch="Uniform" AlignmentX="Left"/>
+                            </Button.Background>
+                        </Button>
                     </DockPanel>
+                    <GridSplitter 
+                        Grid.Row="0" 
+                        Grid.Column="5" 
+                        Grid.RowSpan="2" 
+                        Width="2"
+                        VerticalAlignment="Stretch" 
+                        HorizontalAlignment="Center"
+                        Background="#FF006464">
+                    </GridSplitter>
+                   
+                        <ToggleButton 
+                            Name="btnSetTags"
+                            Width="40" 
+                            Grid.Column="6"
+                            Checked="btnAssignTags_Checked"
+                            Style="{StaticResource MyToggleButtonStyle}"
+                            ToolTip="Назначить метки выделенным файлам">
+                            <ToggleButton.Background>
+                                <ImageBrush ImageSource="Img/check.png" Stretch="Uniform" AlignmentX="Left"/>
+                            </ToggleButton.Background>
+                        </ToggleButton>
+                    
                 </Grid>
                 <!-- End of layer 1-->
-                
+
                 <!-- Layer 2 Add tag panel -->
-                <Grid Name="AddLabelPanel" Grid.Row="0" Height="25" Visibility="Hidden" >
+                <Grid Name="AddLabelPanel" Grid.Row="0" Height="40" Visibility="Hidden" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition Width="25"></ColumnDefinition>
-                        <ColumnDefinition Width="25"></ColumnDefinition>
+                        <ColumnDefinition Width="20"></ColumnDefinition>
+                        <ColumnDefinition Width="20"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <TextBox Name="tbNewLabel" FontSize="14" ></TextBox>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label 
+                        Grid.Row="0"  
+                        FontSize="12" 
+                        VerticalAlignment="Center"
+                        BorderBrush="Transparent"
+                        Padding="0"
+                        >
+                        Создать метку
+                    </Label>
+                    
+                    <TextBox 
+                        Grid.Row="1"  
+                        Name="tbNewLabel" 
+                        FontSize="14" 
+                        VerticalAlignment="Center" >
+                    </TextBox>
                     <Button 
+                        Grid.Row="1" 
                         Name="btnAcceptNewTag" 
                         Grid.Column="1"
-                        Click="btnAcceptNewTag_Click" IsDefault="True">\/</Button>
-                    
+                        Click="btnAcceptNewTag_Click" 
+                        IsDefault="True"
+                        Height="20">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Img/36.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
+
                     <Button 
+                        Grid.Row="1" 
                         Name="btnCancelNewTag" 
                         Grid.Column="2"
-                        Click="btnCancelNewTag_Click">x</Button>
+                        Click="btnCancelNewTag_Click"
+                         Height="20">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Img/33.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
                 </Grid>
                 <!-- End layer 2 -->
-                
+
+                <!-- Layer 2.2 Add tag panel -->
+                <Grid Name="RenameLabelPanel" Grid.Row="0" Height="40" Visibility="Hidden" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="20"></ColumnDefinition>
+                        <ColumnDefinition Width="20"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label 
+                        Grid.Row="0"  
+                        FontSize="12" 
+                        VerticalAlignment="Center"
+                        BorderBrush="Transparent"
+                        Padding="0"
+                        >
+                        Переименовать метку
+                    </Label>
+                    <TextBox Grid.Row="1"
+                             Name="tbNewLabelName" 
+                             FontSize="14" >
+                        
+                    </TextBox>
+                    <Button 
+                        Grid.Row="1"
+                        Name="btnAcceptRename" 
+                        Grid.Column="1"
+                        Click="btnAcceptRename_Click" IsDefault="True">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Img/36.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
+
+                    <Button 
+                        Grid.Row="1"
+                        Name="btnCancelRename" 
+                        Grid.Column="2"
+                        Click="btnCancelRename_Click">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Img/33.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
+                </Grid>
+                <!-- End layer 2.2 -->
+
                 <!-- Layer 3 Accept/Cancel buttons -->
-                <Grid Name="AcceptCancelPanel" Grid.Row="0" Height="25" >
+                <Grid Name="AcceptCancelPanel" Grid.Row="0" Height="40"  Visibility="Hidden">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -260,7 +752,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    
+
                     <DockPanel >
                         <Button Name="AcceptChanges" Click="AcceptChanges_Click" IsDefault="True" >Принять</Button>
                     </DockPanel>
@@ -276,22 +768,50 @@
                         <Button Name="CancelChanges" Click="CancelChanges_Click" IsCancel="True">Отклонить</Button>
                     </DockPanel>
                 </Grid>
-                
+
+                <Grid
+                     Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBox
+                        Name="FindTagTextBox"
+                        Grid.Column="0"
+                        TextChanged="FindTagTextBox_TextChanged"
+                    >                    
+                    </TextBox>
+                    <Button
+                        Grid.Column="1"
+                        Name="ClearTagName"
+                        Width="20"
+                        Click="ClearTagName_Click"
+                        >
+                        <Button.Background>
+                            <ImageBrush ImageSource="Img/33.png" Stretch="Uniform" />
+                        </Button.Background>
+                    </Button>
+                </Grid>
                 <ListView 
                     Name="TagsList" 
-                    Grid.Row="1" 
-                     ItemsSource="{Binding LabelsCollection, Mode=OneWay}"
+                    Grid.Row="2" 
+                    ItemsSource="{Binding LabelsCollection, Mode=OneWay}"
                     ItemTemplate="{StaticResource DynamicCharacterTemplate}"
-                    MouseDown="SelectedTag_MouseDown">
+                    MouseDown="SelectedTag_MouseDown"
+                    
+                    >
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="SelectedTag_MouseDown" />                            
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="SelectedTag_MouseDown" />
                         </Style>
                     </ListView.ItemContainerStyle>
-                </ListView>                
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{x:Static SystemColors.HighlightColor}"/>
+                    </ListView.Resources>
+                </ListView>
             </Grid>
-                       
-            
+
+
             <GridSplitter 
                 Grid.Row="0" 
                 Grid.Column="1" 

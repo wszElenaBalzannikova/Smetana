@@ -8,22 +8,67 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Smetana.Properties
-{
-
-
+namespace Smetana.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".aac;.ac3;.amf;.amr;.ape;.au;.cda;.cdr;.cpr;.flac;.flp;.kar;.m3u;.mid;.mmf;.mod;." +
+            "mp1;.mp2;.mp3;.mpa;.ogg;.pcm;pls;.ram;.wav;.wma")]
+        public string AudioFiles {
+            get {
+                return ((string)(this["AudioFiles"]));
+            }
+            set {
+                this["AudioFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".doc;.docx;.ppt;.pptx;,xls;.xlsx;.csv;.txt;.rtf;.pdf")]
+        public string Documents {
+            get {
+                return ((string)(this["Documents"]));
+            }
+            set {
+                this["Documents"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".avi;.mkv;.mp4")]
+        public string VideoFiles {
+            get {
+                return ((string)(this["VideoFiles"]));
+            }
+            set {
+                this["VideoFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".jpg;.jpeg;.png;.gif;.tiff")]
+        public string ImageFiles {
+            get {
+                return ((string)(this["ImageFiles"]));
+            }
+            set {
+                this["ImageFiles"] = value;
             }
         }
     }
