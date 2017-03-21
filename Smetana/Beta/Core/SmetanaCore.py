@@ -72,6 +72,9 @@ class ApplicationCore(object):
     def RenameTag(self, OldTagName, NewTagName):
        return self.CurrentCollection.RenameTag(OldTagName, NewTagName)
 
+    def RemoveTag(self, TagName):  
+        return self.RemoveTag(TagName)
+
     def PrintFiles(self):
          return self.CurrentCollection.PrintFiles()
 

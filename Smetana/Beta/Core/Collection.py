@@ -100,6 +100,18 @@ class Collection:
        self.TagsList[TagId] = NewTagName
        return True
 
+    def RemoveTag(self, TagName):
+       TagId = self.GetTagId(TagName)
+       if TagId == 0:
+            return False
+       for Bucket in self.FileBuckets:
+            for x in self.FileBuckets[Bucket]:
+                if TagId in self.FileBuckets[Bucket][x].TagsList:
+                    self.FileBuckets[Bucket][x].TagsList.remove(TagId)
+       
+       self.TagsList.pop(TagId)
+       return True
+
     def PrintFiles(self):
         for Bucket in self.FileBuckets:
             for x in self.FileBuckets[Bucket]:
